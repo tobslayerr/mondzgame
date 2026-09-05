@@ -15,7 +15,8 @@ import AddAccountPage from './pages/admin/AddAccountPage.jsx';
 import ListAccountPage from './pages/admin/ListAccountPage.jsx';
 import InvoicePage from './pages/admin/InvoicePage.jsx';
 import AdminPaymentSettings from './pages/admin/AdminPaymentSettings.jsx';
-import AdminPlayerConfigs from './pages/admin/AdminPlayerConfigs.jsx'; // <-- 1. Import halaman kelola pemandu/pemain dinamis
+import AdminPlayerConfigs from './pages/admin/AdminPlayerConfigs.jsx';
+import AdminPackageConfigs from './pages/admin/AdminPackageConfigs.jsx'; // <-- 1. Import halaman pengaturan probabilitas paket
 
 // Component for private routes
 const PrivateRoute = ({ children }) => {
@@ -55,7 +56,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="accounts/list" element={<ListAccountPage />} />
           <Route path="invoices" element={<InvoicePage />} />
           <Route path="payment-settings" element={<AdminPaymentSettings />} />
-          <Route path="player-configs" element={<AdminPlayerConfigs />} /> {/* <-- 2. Daftarkan rute ke sini */}
+          <Route path="player-configs" element={<AdminPlayerConfigs />} />
+          <Route path="package-configs" element={<AdminPackageConfigs />} /> {/* <-- 2. Daftarkan rute ke sini */}
           
           {/* Catch-all route untuk 404 dalam dashboard */}
           <Route path="*" element={<Navigate to="accounts/list" replace />} />
