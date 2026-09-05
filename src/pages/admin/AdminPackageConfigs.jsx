@@ -74,9 +74,16 @@ const AdminPackageConfigs = () => {
     }
   };
 
-  // Helper mengambil sampel gambar nyata yang pernah di-upload admin berdasarkan tier
+  // Kalkulasi total bobot & persentase riil secara otomatis
+  const totalWeight = Object.values(currentWeights).reduce((a, b) => a + b, 0);
+  
+  const getRealPercentage = (weight) => {
+    if (totalWeight === 0) return '0.0';
+    return ((weight / totalWeight) * 100).toFixed(1);
+  };
+
+  // Helper mengambil sampel gambar nyata berdasarkan tier
   const getSampleImageForTier = (tierName) => {
-    // Mapping Gacha Tier ke Player Config Tier (a, b, c, d)
     let targetKey = 'd';
     if (tierName === 'Radiant') targetKey = 'a';
     else if (tierName === 'Flux') targetKey = 'b';
@@ -85,9 +92,9 @@ const AdminPackageConfigs = () => {
 
     const found = playerConfigs.find(c => c.tier === targetKey);
     if (found && found.images && found.images.length > 0) {
-      return found.images[0]; // Ambil gambar pertama sebagai sampel preview
+      return found.images[0];
     }
-    return null; // Fallback jika belum ada gambar
+    return null;
   };
 
   // Helper styling tema kartu pratinjau
@@ -160,6 +167,28 @@ const AdminPackageConfigs = () => {
           </div>
         </div>
 
+        {/* --- KOTAK HINT & PATOKAN PERHITUNGAN REAL-TIME --- */}
+        <div className="p-4 bg-primary-dark border border-yellow-600/50 rounded-xl space-y-3">
+          <div className="flex items-center gap-2 text-yellow-400 font-bold text-sm">
+            <span>💡</span>
+            <h4>Panduan & Kalkulasi Peluang Nyata (*Real-Time*)</h4>
+          </div>
+          <p className="text-xs text-gray-300 leading-relaxed">
+            Sistem otomatis menghitung perbandingan dari total slider Anda (<span className="text-yellow-400 font-mono font-bold">Total Bobot: {totalWeight}</span>). Di bawah ini adalah persentase kemunculan asli yang akan dialami oleh pemain:
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            {Object.keys(currentWeights).map((tier) => (
+              <div key={tier} className="bg-secondary-dark p-2.5 rounded border border-gray-700 text-center">
+                <span className="text-[11px] text-gray-400 block uppercase font-bold">{tier}</span>
+                <span className="text-lg font-extrabold text-yellow-400 font-mono">{getRealPercentage(currentWeights[tier])}%</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400 italic pt-1">
+            * <b>Tips Patokan:</b> Jika ingin suatu tier **tidak pernah muncul sama sekali**, geser slider-nya ke 0%. Jika ingin sebuah tier **sangat sering mendominasi**, berikan nilai slider yang jauh lebih tinggi dibanding tier lainnya.
+          </p>
+        </div>
+
         {/* Grid Slider dengan Pratinjau Kartu & Gambar Nyata */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {Object.keys(currentWeights).map((tier) => {
@@ -186,8 +215,8 @@ const AdminPackageConfigs = () => {
                 {/* Kontrol Slider Persentase */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-gray-300 uppercase">Peluang {tier}</label>
-                    <span className="text-base font-extrabold text-yellow-400 font-mono">{currentWeights[tier]}%</span>
+                    <label className="text-xs font-bold text-gray-300 uppercase">Nilai Slider {tier}</label>
+                    <span className="text-base font-extrabold text-yellow-400 font-mono">{currentWeights[tier]}</span>
                   </div>
                   
                   <input
@@ -200,8 +229,8 @@ const AdminPackageConfigs = () => {
                   />
                   
                   <div className="flex justify-between text-[10px] text-gray-500 font-mono">
-                    <span>0% (Min)</span>
-                    <span>100% (Maks)</span>
+                    <span>0 (Min)</span>
+                    <span>100 (Maks)</span>
                   </div>
                 </div>
 
