@@ -163,30 +163,42 @@ const AdminPackageConfigs = () => {
             <h3 className="text-lg font-bold text-yellow-400 uppercase">
               Atur Peluang Paket Rp {selectedAmount.toLocaleString('id-ID')}
             </h3>
-            <p className="text-xs text-gray-400">Geser slider untuk menentukan seberapa sering kartu dari tier ini muncul saat user membuka kotak.</p>
+            <p className="text-xs text-gray-400">Setiap user yang membuka kotak pada paket ini dijamin akan selalu mendapatkan <strong>3 kartu</strong> dengan rincian peluang di bawah.</p>
           </div>
         </div>
 
-        {/* --- KOTAK HINT & PATOKAN PERHITUNGAN REAL-TIME --- */}
+        {/* --- KOTAK HINT & CONTOH PERHITUNGAN JELAS --- */}
         <div className="p-4 bg-primary-dark border border-yellow-600/50 rounded-xl space-y-3">
           <div className="flex items-center gap-2 text-yellow-400 font-bold text-sm">
             <span>💡</span>
-            <h4>Panduan & Kalkulasi Peluang Nyata (*Real-Time*)</h4>
+            <h4>Panduan & Contoh Cara Mengaturnya</h4>
           </div>
           <p className="text-xs text-gray-300 leading-relaxed">
-            Sistem otomatis menghitung perbandingan dari total slider Anda (<span className="text-yellow-400 font-mono font-bold">Total Bobot: {totalWeight}</span>). Di bawah ini adalah persentase kemunculan asli yang akan dialami oleh pemain:
+            Slider ini menggunakan sistem perbandingan fleksibel. Agar lebih mudah, Anda bisa mengatur slider hingga totalnya pas <strong>100</strong> (atau mendekati 100), sehingga angka di slider sama persis dengan persentase aslinya.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            {Object.keys(currentWeights).map((tier) => (
-              <div key={tier} className="bg-secondary-dark p-2.5 rounded border border-gray-700 text-center">
-                <span className="text-[11px] text-gray-400 block uppercase font-bold">{tier}</span>
-                <span className="text-lg font-extrabold text-yellow-400 font-mono">{getRealPercentage(currentWeights[tier])}%</span>
-              </div>
-            ))}
+          
+          {/* Contoh Panduan Cepat */}
+          <div className="bg-secondary-dark p-3 rounded-lg border border-gray-700 text-xs space-y-1">
+            <span className="font-bold text-yellow-400 block mb-1">📝 Contoh Pengaturan Sederhana (Total Pas 100%):</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-gray-300 font-mono">
+              <div>• Nova: <strong>10</strong> (10%)</div>
+              <div>• Pulse: <strong>40</strong> (40%)</div>
+              <div>• Flux: <strong>30</strong> (30%)</div>
+              <div>• Radiant: <strong>20</strong> (20%)</div>
+            </div>
           </div>
-          <p className="text-[11px] text-gray-400 italic pt-1">
-            * <b>Tips Patokan:</b> Jika ingin suatu tier **tidak pernah muncul sama sekali**, geser slider-nya ke 0%. Jika ingin sebuah tier **sangat sering mendominasi**, berikan nilai slider yang jauh lebih tinggi dibanding tier lainnya.
-          </p>
+
+          <div className="pt-2">
+            <span className="text-xs font-bold text-gray-300 block mb-2">📊 Persentase Nyata Berdasarkan Posisi Slider Anda Saat Ini (Total Bobot: {totalWeight}):</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {Object.keys(currentWeights).map((tier) => (
+                <div key={tier} className="bg-secondary-dark p-2.5 rounded border border-gray-700 text-center">
+                  <span className="text-[11px] text-gray-400 block uppercase font-bold">{tier}</span>
+                  <span className="text-lg font-extrabold text-yellow-400 font-mono">{getRealPercentage(currentWeights[tier])}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Grid Slider dengan Pratinjau Kartu & Gambar Nyata */}
