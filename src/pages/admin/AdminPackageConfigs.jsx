@@ -5,31 +5,38 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 
 const AdminPackageConfigs = () => {
   const [configs, setConfigs] = useState([]);
+  const [playerConfigs, setPlayerConfigs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAmount, setSelectedAmount] = useState(50000);
   const [currentWeights, setCurrentWeights] = useState({ Nova: 0, Pulse: 0, Flux: 0, Radiant: 0 });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
-  const fetchConfigs = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await API.get('/package-configs');
-      if (res.data.success) {
-        setConfigs(res.data.data);
-        const current = res.data.data.find(c => c.packageAmount === selectedAmount);
+      const [packageRes, playerRes] = await Promise.all([
+        API.get('/package-configs'),
+        API.get('/player-configs').catch(() => ({ data: { data: [] } }))
+      ]);
+
+      if (packageRes.data.success) {
+        setConfigs(packageRes.data.data);
+        const current = packageRes.data.data.find(c => c.packageAmount === selectedAmount);
         if (current) setCurrentWeights(current.weights || { Nova: 0, Pulse: 0, Flux: 0, Radiant: 0 });
       }
+      if (playerRes.data.success) {
+        setPlayerConfigs(playerRes.data.data);
+      }
     } catch (err) {
-      console.error('Gagal memuat konfigurasi probabilitas:', err);
+      console.error('Gagal memuat data konfigurasi:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchConfigs();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchData();
   }, []);
 
   const handleAmountChange = (amount) => {
@@ -41,15 +48,13 @@ const AdminPackageConfigs = () => {
     setMessage({ text: '', type: '' });
   };
 
-  const handleWeightChange = (tier, value) => {
-    const numValue = Math.max(0, Number(value));
+  const handleSliderChange = (tier, value) => {
+    const numValue = Math.max(0, Math.min(100, Number(value)));
     setCurrentWeights(prev => ({
       ...prev,
       [tier]: numValue
     }));
   };
-
-  const totalWeight = Object.values(currentWeights).reduce((a, b) => a + b, 0);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -60,12 +65,38 @@ const AdminPackageConfigs = () => {
       const res = await API.put(`/package-configs/${selectedAmount}`, { weights: currentWeights });
       if (res.data.success) {
         setMessage({ text: res.data.message, type: 'success' });
-        fetchConfigs();
+        fetchData();
       }
     } catch (err) {
       setMessage({ text: err.response?.data?.message || 'Gagal menyimpan pengaturan.', type: 'error' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Helper mengambil sampel gambar nyata yang pernah di-upload admin berdasarkan tier
+  const getSampleImageForTier = (tierName) => {
+    // Mapping Gacha Tier ke Player Config Tier (a, b, c, d)
+    let targetKey = 'd';
+    if (tierName === 'Radiant') targetKey = 'a';
+    else if (tierName === 'Flux') targetKey = 'b';
+    else if (tierName === 'Pulse') targetKey = 'c';
+    else if (tierName === 'Nova') targetKey = 'd';
+
+    const found = playerConfigs.find(c => c.tier === targetKey);
+    if (found && found.images && found.images.length > 0) {
+      return found.images[0]; // Ambil gambar pertama sebagai sampel preview
+    }
+    return null; // Fallback jika belum ada gambar
+  };
+
+  // Helper styling tema kartu pratinjau
+  const getTierCardTheme = (tier) => {
+    switch (tier) {
+      case 'Radiant': return 'border-red-500 bg-gradient-to-br from-red-950/80 to-[#1a1a2e] text-red-200 shadow-red-500/20';
+      case 'Flux': return 'border-yellow-500 bg-gradient-to-br from-yellow-950/80 to-[#1a1a2e] text-yellow-200 shadow-yellow-500/20';
+      case 'Pulse': return 'border-green-500 bg-gradient-to-br from-green-950/80 to-[#1a1a2e] text-green-200 shadow-green-500/20';
+      case 'Nova': default: return 'border-blue-500 bg-gradient-to-br from-blue-950/80 to-[#1a1a2e] text-blue-200 shadow-blue-500/20';
     }
   };
 
@@ -82,7 +113,7 @@ const AdminPackageConfigs = () => {
   }
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative font-sans">
       {saving && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl min-h-[400px]">
           <LoadingSpinner size="h-10 w-10" />
@@ -91,8 +122,8 @@ const AdminPackageConfigs = () => {
       )}
 
       <div>
-        <h2 className="text-2xl font-bold text-white">Pengaturan Probabilitas Drop Rate Gacha</h2>
-        <p className="text-gray-400 text-sm">Atur tingkat bobot kemunculan tier (Nova, Pulse, Flux, Radiant) untuk setiap nominal paket.</p>
+        <h2 className="text-2xl font-bold text-white">Pengaturan Peluang / Probabilitas Gacha</h2>
+        <p className="text-gray-400 text-sm">Atur tingkat persentase kemunculan setiap tier beserta pratinjau kartu permainannya.</p>
       </div>
 
       {/* Tab Pilihan Nominal Paket */}
@@ -120,30 +151,63 @@ const AdminPackageConfigs = () => {
       )}
 
       <form onSubmit={handleSave} className="bg-secondary-dark border border-gray-700 rounded-xl p-6 shadow-md space-y-6">
-        <div className="flex justify-between items-center border-b border-gray-700 pb-3">
-          <h3 className="text-lg font-bold text-yellow-400 uppercase">
-            Konfigurasi Bobot Paket Rp {selectedAmount.toLocaleString('id-ID')}
-          </h3>
-          <div className="text-sm font-semibold text-gray-300">
-            Total Bobot: <span className="text-yellow-400 font-mono text-base">{totalWeight}</span> (Relatif / Rasio)
+        <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+          <div>
+            <h3 className="text-lg font-bold text-yellow-400 uppercase">
+              Atur Peluang Paket Rp {selectedAmount.toLocaleString('id-ID')}
+            </h3>
+            <p className="text-xs text-gray-400">Geser slider untuk menentukan seberapa sering kartu dari tier ini muncul saat user membuka kotak.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.keys(currentWeights).map((tier) => (
-            <div key={tier} className="bg-primary-dark border border-gray-700 rounded-lg p-4 space-y-2">
-              <label className="block text-sm font-bold text-white uppercase tracking-wider">{tier}</label>
-              <p className="text-xs text-gray-400">Nilai bobot rasio kemunculan</p>
-              <input
-                type="number"
-                min="0"
-                className="w-full bg-secondary-dark border border-gray-600 rounded p-2 text-white font-mono text-lg focus:border-yellow-400 outline-none"
-                value={currentWeights[tier]}
-                onChange={(e) => handleWeightChange(tier, e.target.value)}
-                required
-              />
-            </div>
-          ))}
+        {/* Grid Slider dengan Pratinjau Kartu & Gambar Nyata */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {Object.keys(currentWeights).map((tier) => {
+            const sampleImg = getSampleImageForTier(tier);
+            return (
+              <div key={tier} className="bg-primary-dark border border-gray-700 rounded-xl p-4 flex flex-col justify-between shadow-lg space-y-4">
+                
+                {/* Kotak Pratinjau Visual Kartu Game */}
+                <div className={`border-2 rounded-xl p-3 text-center shadow-md relative overflow-hidden flex flex-col items-center ${getTierCardTheme(tier)}`}>
+                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Pratinjau Kartu</span>
+                  
+                  {/* Container Gambar Kartu */}
+                  <div className="w-20 h-20 bg-black/40 border border-current/30 rounded-lg flex items-center justify-center p-1 my-1 shadow-inner overflow-hidden">
+                    {sampleImg ? (
+                      <img src={sampleImg} alt={tier} className="max-h-full max-w-full object-contain" />
+                    ) : (
+                      <span className="text-[10px] text-gray-400 italic">Belum ada gambar</span>
+                    )}
+                  </div>
+
+                  <h4 className="text-lg font-extrabold tracking-wide mt-1">{tier}</h4>
+                </div>
+
+                {/* Kontrol Slider Persentase */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-gray-300 uppercase">Peluang {tier}</label>
+                    <span className="text-base font-extrabold text-yellow-400 font-mono">{currentWeights[tier]}%</span>
+                  </div>
+                  
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={currentWeights[tier]}
+                    onChange={(e) => handleSliderChange(tier, e.target.value)}
+                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+                  />
+                  
+                  <div className="flex justify-between text-[10px] text-gray-500 font-mono">
+                    <span>0% (Min)</span>
+                    <span>100% (Maks)</span>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex justify-end pt-4 border-t border-gray-700">
@@ -152,7 +216,7 @@ const AdminPackageConfigs = () => {
             disabled={saving}
             className="px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded font-semibold text-sm transition shadow flex items-center gap-2"
           >
-            {saving ? 'Menyimpan...' : 'Simpan Probabilitas'}
+            {saving ? 'Menyimpan...' : 'Simpan Pengaturan Probabilitas'}
           </button>
         </div>
       </form>
