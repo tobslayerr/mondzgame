@@ -161,6 +161,7 @@ const GachaPlay = () => {
   const [error, setError] = useState('');
   const [givenAccountId, setGivenAccountId] = useState(null);
   const [isProcessingAction, setIsProcessingAction] = useState(false);
+  const [packageAmount, setPackageAmount] = useState(50000); // State nominal harga paket
   
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [infoModalContent, setInfoModalContent] = useState({ title: '', message: '', type: 'info' });
@@ -190,8 +191,10 @@ const GachaPlay = () => {
         }
 
         if (gachaRes.data.status === 'not_used') {
+          setPackageAmount(gachaRes.data.packageAmount || 50000);
           setStep('ready');
         } else if (gachaRes.data.status === 'used' || gachaRes.data.status === 'used_account_deleted') {
+          setPackageAmount(gachaRes.data.packageAmount || 50000);
           setError("Link gacha ini sudah digunakan.");
           setPrize(gachaRes.data.account);
           setGivenAccountId(gachaRes.data.accountId);
@@ -223,6 +226,7 @@ const GachaPlay = () => {
     setError('');
     try {
       const res = await API.get(`/gacha/${token}?claim=true`); 
+      setPackageAmount(res.data.packageAmount || 50000);
       setPrize(res.data.account);
       setDummies(res.data.dummyPrizes);
       setGivenAccountId(res.data.accountId);
@@ -287,6 +291,24 @@ const GachaPlay = () => {
     showInfoModal('Info', 'Membuka WhatsApp untuk konfirmasi...', 'info');
     
     setTimeout(() => setIsProcessingAction(false), 1000);
+  };
+
+  // Helper render badge nominal harga gacha di header
+  const renderPackageHeaderBadge = (amount) => {
+    let badgeStyle = "bg-blue-500/20 border-blue-500/40 text-blue-300";
+    if (amount >= 150000) {
+      badgeStyle = "bg-red-500/20 border-red-500/40 text-red-300 shadow-lg shadow-red-500/10";
+    } else if (amount >= 100000) {
+      badgeStyle = "bg-yellow-500/20 border-yellow-500/40 text-yellow-300 shadow-lg shadow-yellow-500/10";
+    }
+
+    return (
+      <div className="flex justify-center mb-4">
+        <div className={`px-4 py-1.5 rounded-full border text-xs sm:text-sm font-bold tracking-wider uppercase ${badgeStyle}`}>
+          Nominal Paket: Rp {Number(amount).toLocaleString('id-ID')}
+        </div>
+      </div>
+    );
   };
 
 
@@ -359,6 +381,10 @@ const GachaPlay = () => {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="main-container">
       <h2 className="header-text">Klaim Hadiah Gacha Anda!</h2>
+      
+      {/* Tampilkan Badge Nominal Harga Paket */}
+      {renderPackageHeaderBadge(packageAmount)}
+
       {error && step !== 'done' && <motion.p {...animProps} className="error-text mb-4">{error}</motion.p>}
       <div className="content-container">{renderContent()}</div>
 
