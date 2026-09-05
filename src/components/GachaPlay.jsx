@@ -111,7 +111,7 @@ const PrizeCard = ({ prize, isWinner, layoutClass = "", onImageClick = () => {} 
 
         {!isWinner && players && players.length > 0 && (
           <div className="mt-3">
-             <p className="prize-card-player-label">Isian Pemain:</p>
+             <p className="prize-card-player-label">Isian Pemain (Di Kotak Lain):</p>
             <div className="flex justify-center items-center gap-3 sm:gap-4 flex-wrap">
               {players.map((playerPath, index) => (
                 <div key={index} className="relative group">
@@ -161,13 +161,12 @@ const GachaPlay = () => {
   const [error, setError] = useState('');
   const [givenAccountId, setGivenAccountId] = useState(null);
   const [isProcessingAction, setIsProcessingAction] = useState(false);
-  const [packageAmount, setPackageAmount] = useState(50000); // State nominal harga paket
+  const [packageAmount, setPackageAmount] = useState(50000);
   
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [infoModalContent, setInfoModalContent] = useState({ title: '', message: '', type: 'info' });
   const [fullScreenImage, setFullScreenImage] = useState(null);
 
-  // State nomor WhatsApp admin dinamis
   const [adminWaNumber, setAdminWaNumber] = useState('6283117420946');
 
   const showInfoModal = (title, message, type = 'info') => {
@@ -209,7 +208,6 @@ const GachaPlay = () => {
         setStep('error');
 
         if (err.response?.status === 404 || err.response?.status === 400) {
-            console.log("Token tidak valid, redirecting to login...");
             setTimeout(() => {
                 navigate('/auth');
             }, 1500);
@@ -262,7 +260,6 @@ const GachaPlay = () => {
 
     try {
         await API.post('/user/request-verification', { accountId: givenAccountId });
-        console.log("Verification request sent to backend.");
     } catch (err) {
         console.error("Failed to send verification request to backend:", err.message);
     } finally {
@@ -293,7 +290,6 @@ const GachaPlay = () => {
     setTimeout(() => setIsProcessingAction(false), 1000);
   };
 
-  // Helper render badge nominal harga gacha di header
   const renderPackageHeaderBadge = (amount) => {
     let badgeStyle = "bg-blue-500/20 border-blue-500/40 text-blue-300";
     if (amount >= 150000) {
@@ -355,10 +351,15 @@ const GachaPlay = () => {
                 </div>
             )}
           </AnimatePresence>
+          
           {dummyCards.length > 0 && (
-            <div className="mt-8 pt-8 border-t border-gray-700/50">
-              <h4 className="subtitle-text">Anda Melewatkan:</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center mt-5">
+            <div className="mt-8 pt-8 border-t border-gray-700/50 text-center">
+              <h4 className="subtitle-text text-gray-300">✨ Hadiah Alternatif Lain yang Anda Melewatkan ✨</h4>
+              <p className="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto mb-6 bg-secondary-dark/60 p-3 rounded-lg border border-gray-700">
+                📌 <strong className="text-yellow-400">Pemberitahuan Penting:</strong> Gambar pemain dan akun di bawah ini adalah <span className="text-red-400 font-semibold">hadiah alternatif/sisa dari kotak lain yang TIDAK ANDA DAPATKAN</span>. Anda hanya memenangkan akun utama di atas!
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center mt-3">
                 {dummyCards.map((p, index) => (
                   <PrizeCard
                     key={`dummy-${index}`}
@@ -382,7 +383,6 @@ const GachaPlay = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="main-container">
       <h2 className="header-text">Klaim Hadiah Gacha Anda!</h2>
       
-      {/* Tampilkan Badge Nominal Harga Paket */}
       {renderPackageHeaderBadge(packageAmount)}
 
       {error && step !== 'done' && <motion.p {...animProps} className="error-text mb-4">{error}</motion.p>}
@@ -481,7 +481,6 @@ const styles = `
   .prize-card-tier { font-weight: 800; margin-bottom: 1rem; sm:margin-bottom: 1.25rem; line-height: 1.1; }
   .prize-card-player-label { font-size: 0.85rem; color: #bdc3c7; margin-bottom: 0.5rem; opacity: 0.9; font-weight: 600; }
   
-  /* Perbaikan Player Image Wrapper agar gambar tidak terpotong */
   .player-image-wrapper { position: relative; border-radius: 0.5rem; background-color: #0d0d1a; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; display: flex; align-items: center; justify-content: center; width: 6rem; height: 6rem; sm:width: 7rem; sm:height: 7rem; }
   .player-image-wrapper.cursor-pointer:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(255,255,255,0.2); }
   .player-image { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 0.35rem; }
