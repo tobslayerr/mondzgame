@@ -8,91 +8,127 @@ import LoadingSpinner from './LoadingSpinner';
 import InfoModal from './modals/InfoModal';
 
 // =====================================================================
-// 1. KOMPONEN UI & GACHA
+// 1. KOMPONEN UI & NEO-BRUTALISM GACHA
 // =====================================================================
 const FullScreenImageViewer = ({ src, onClose }) => {
   if (!src) return null;
   return (
-    <motion.div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-      <motion.div className="relative max-w-lg w-auto max-h-[85vh] bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-700 p-2" initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()}>
-        <img src={src} alt="Full screen player view" className="block max-w-full max-h-[82vh] object-contain mx-auto rounded-lg" />
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/60 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg focus:outline-none">✕</button>
+    <motion.div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+      <motion.div className="relative max-w-lg w-full max-h-[85vh] bg-white brutal-border p-3 flex flex-col shadow-[12px_12px_0_#000]" initial={{ scale: 0.5, opacity: 0, rotate: -10 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} exit={{ scale: 0.5, opacity: 0, rotate: 10 }} transition={{ type: 'spring', damping: 15, stiffness: 300 }} onClick={(e) => e.stopPropagation()}>
+        <div className="border-4 border-black w-full overflow-hidden bg-white mb-2">
+          <img src={src} alt="Full screen view" className="block w-full h-auto max-h-[75vh] object-contain mx-auto" />
+        </div>
+        <button onClick={onClose} className="absolute -top-4 -right-4 p-2 bg-[#FF3366] text-white border-4 border-black shadow-[4px_4px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none focus:outline-none transition-all">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
       </motion.div>
     </motion.div>
   );
 };
 
-const getPlayerTierBorderColor = (playerPath) => {
-  if (!playerPath) return 'border-gray-600';
-  if (playerPath.includes('/tier_a/')) return 'border-red-500 shadow-red-500/20';
-  if (playerPath.includes('/tier_b/')) return 'border-green-400 shadow-green-400/20';
-  if (playerPath.includes('/tier_c/')) return 'border-blue-400 shadow-blue-400/20';
-  if (playerPath.includes('/tier_d/')) return 'border-purple-400 shadow-purple-400/20';
-  return 'border-gray-600';
-};
-
 const IconQuestionMark = () => (
-  <svg className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400 opacity-50 group-hover:opacity-100 group-hover:text-yellow-400 transition-all duration-300 drop-shadow-md" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+  <svg className="w-16 h-16 sm:w-24 sm:h-24 text-black drop-shadow-[3px_3px_0_#fff]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
   </svg>
 );
 
-const MysteryBox = ({ onClick }) => (
-  <motion.button onClick={onClick} className="mystery-box group relative overflow-hidden bg-gray-800 border-2 border-gray-600 hover:border-yellow-500 rounded-xl" whileHover={{ scale: 1.05, y: -5, boxShadow: "0px 10px 30px rgba(234, 179, 8, 0.2)" }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
-    <div className="absolute inset-0 bg-gradient-to-tr from-gray-700/30 to-gray-600/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    <motion.div className="mystery-box-inner flex items-center justify-center w-full h-full" whileHover={{ rotateY: 15, rotateX: -10 }}>
-      <IconQuestionMark />
-    </motion.div>
-  </motion.button>
-);
+const MysteryBox = ({ onClick, colorHex }) => {
+  return (
+    <motion.button 
+      onClick={onClick} 
+      style={{ backgroundColor: colorHex }}
+      className="relative w-full sm:w-[22%] h-36 sm:h-48 flex items-center justify-center cursor-pointer brutal-border brutal-shadow hover-brutal" 
+      whileTap={{ scale: 0.9, y: 5, x: 5, boxShadow: "0px 0px 0px 0px #000" }} 
+    >
+      <motion.div 
+        whileHover={{ rotate: [0, -15, 15, -15, 0], scale: 1.2 }}
+        transition={{ duration: 0.5 }}
+      >
+        <IconQuestionMark />
+      </motion.div>
+    </motion.button>
+  );
+};
 
-const PrizeCard = ({ prize, isWinner, layoutClass = "", onImageClick = () => {}, delayIndex = 0 }) => {
+const PrizeCard = ({ prize, isWinner, isHidden, layoutClass = "", onImageClick = () => {}, delayIndex = 0 }) => {
   const { tier, email, password, players } = prize;
-  const getCardTierStyling = () => {
+  
+  const getTierColor = () => {
     switch (tier) {
-      case 'Radiant': return 'tier-radiant';
-      case 'Flux': return 'tier-flux';
-      case 'Pulse': return 'tier-pulse';
-      case 'Nova': default: return 'tier-nova';
+      case 'Radiant': return '#FF3366'; // Merah Neon
+      case 'Flux': return '#FFDE00';    // Kuning Terang
+      case 'Pulse': return '#39FF14';   // Hijau Stabilo
+      case 'Nova': default: return '#00E5FF'; // Biru Cyan
     }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8, rotateY: 90, y: 30 },
-    visible: { opacity: 1, scale: 1, rotateY: 0, y: 0, transition: { type: 'spring', damping: 20, stiffness: 100, delay: delayIndex * 0.15 } }
+    hidden: { opacity: 0, scale: 0.5, y: 100 },
+    visible: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', damping: 12, stiffness: 100, delay: delayIndex * 0.15 } }
   };
 
   return (
-    <motion.div variants={cardVariants} initial="hidden" animate="visible" className={`prize-card relative ${getCardTierStyling()} ${layoutClass} ${isWinner ? 'prize-card-winner' : 'prize-card-dummy'}`}>
+    <motion.div variants={cardVariants} initial="hidden" animate="visible" className={`bg-white brutal-border flex flex-col ${layoutClass} ${isWinner ? 'shadow-[12px_12px_0_#000] z-10' : 'brutal-shadow'}`}>
       
-      {/* Shine Effect Animation for Winner */}
-      {isWinner && <div className="shine-effect"></div>}
+      {/* Header Kartu */}
+      <div style={{ backgroundColor: getTierColor() }} className={`brutal-border-bottom relative flex flex-col items-center justify-center ${isWinner ? 'p-6 sm:p-10' : 'p-4 sm:p-6'}`}>
+        <div className="absolute top-2 left-2 bg-black text-white text-[10px] sm:text-xs font-black px-2 py-1 uppercase tracking-widest border-2 border-white">
+          TIER
+        </div>
 
-      <div className={`prize-card-top ${isWinner ? 'pt-8 pb-5' : 'py-5'}`}>
-        <h3 className={`prize-card-label ${isWinner ? 'text-lg text-yellow-400' : 'text-sm text-gray-400'}`}>{isWinner ? 'Anda Mendapatkan' : ''}</h3>
-        <h2 className={`prize-card-tier ${isWinner ? 'text-5xl text-white font-black tracking-widest' : 'text-3xl font-bold text-gray-200'}`}>{tier}</h2>
+        <h3 className={`font-black uppercase mt-6 mb-1 text-black bg-white px-3 py-1 brutal-border ${isWinner ? 'text-sm sm:text-lg' : 'text-xs sm:text-sm'}`}>
+          {isWinner ? 'KAMU DAPAT' : 'DI KOTAK LAIN'}
+        </h3>
+        <h2 className={`font-black uppercase tracking-tighter text-black drop-shadow-[4px_4px_0_#fff] ${isWinner ? 'text-6xl sm:text-8xl' : 'text-4xl sm:text-5xl'}`}>
+          {tier}
+        </h2>
         
         {!isWinner && players && players.length > 0 && (
-          <div className="mt-4">
-             <p className="prize-card-player-label">Isian Pemain (Di Kotak Lain):</p>
+          <div className="mt-6 w-full bg-white brutal-border p-4">
+             <p className="text-xs sm:text-sm font-black text-black uppercase tracking-wider mb-3 text-center">ISI PEMAIN:</p>
             <div className="flex justify-center items-center gap-3 sm:gap-4 flex-wrap">
               {players.map((playerPath, index) => (
-                <div key={index} className="relative group">
-                  <button type="button" onClick={() => playerPath && !playerPath.includes('placeholder') && onImageClick(playerPath)} className={`player-image-wrapper border border-gray-600 ${getPlayerTierBorderColor(playerPath)} ${playerPath && !playerPath.includes('placeholder') ? 'cursor-pointer hover:border-white transition-colors' : ''}`} disabled={!playerPath || playerPath.includes('placeholder')}>
-                    <img src={playerPath || '/players/placeholder.webp'} alt={`Pemain ${index + 1}`} className="player-image" loading="lazy" />
-                  </button>
-                </div>
+                <button 
+                  key={index}
+                  type="button" 
+                  onClick={() => playerPath && !playerPath.includes('placeholder') && onImageClick(playerPath)} 
+                  className={`relative w-14 h-14 sm:w-20 sm:h-20 bg-white brutal-border p-1 transition-transform ${playerPath && !playerPath.includes('placeholder') ? 'cursor-pointer hover-brutal hover:scale-110' : 'opacity-50 grayscale'}`} 
+                  disabled={!playerPath || playerPath.includes('placeholder')}
+                >
+                  <img src={playerPath || '/players/placeholder.webp'} alt={`Pemain ${index + 1}`} className="w-full h-full object-contain" loading="lazy" />
+                </button>
               ))}
             </div>
           </div>
         )}
       </div>
-      {isWinner && (
-        <div className="prize-card-bottom bg-black/50 p-4 border-t border-white/10">
-          <p className="login-label text-gray-400 text-xs uppercase tracking-wider mb-1">Email Akses</p>
-          <p className="login-value text-white font-mono text-sm sm:text-base mb-3 bg-black/40 px-3 py-2 rounded border border-gray-700 select-all">{email}</p>
-          <p className="login-label text-gray-400 text-xs uppercase tracking-wider mb-1">Kata Sandi</p>
-          <p className="login-value text-white font-mono text-sm sm:text-base bg-black/40 px-3 py-2 rounded border border-gray-700 select-all">{password}</p>
+      
+      {/* Detail Akun (Khusus Pemenang) */}
+      {isWinner && !isHidden && (
+        <div className="bg-[#F4F4F0] p-6 sm:p-8 relative text-left flex-grow flex flex-col justify-center border-t-4 border-black pattern-dots">
+          <div className="bg-white brutal-border p-4 mb-5 shadow-[6px_6px_0_#000]">
+            <p className="text-xs font-black text-black uppercase tracking-widest mb-2 bg-[#FF90E8] inline-block px-2 py-1 border-2 border-black">EMAIL AKSES</p>
+            <p className="font-mono font-bold text-black text-sm sm:text-lg break-all select-all mt-1">{email}</p>
+          </div>
+          <div className="bg-white brutal-border p-4 shadow-[6px_6px_0_#000]">
+            <p className="text-xs font-black text-black uppercase tracking-widest mb-2 bg-[#00E5FF] inline-block px-2 py-1 border-2 border-black">PASSWORD</p>
+            <p className="font-mono font-bold text-black text-sm sm:text-lg break-all select-all mt-1">{password}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Peringatan Kemananan (Jika Akun Sudah di Refresh/Claimed) */}
+      {isWinner && isHidden && (
+        <div className="bg-[#FF3366] p-6 sm:p-10 relative text-center flex-grow flex flex-col justify-center items-center border-t-4 border-black pattern-dots">
+          <svg className="w-14 h-14 text-white mb-4 drop-shadow-[3px_3px_0_#000]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <h4 className="text-white font-black text-2xl sm:text-3xl tracking-widest uppercase mb-3 drop-shadow-[3px_3px_0_#000]">INFO HILANG</h4>
+          <div className="bg-black p-4 brutal-border transform rotate-1 shadow-[6px_6px_0_#FFF]">
+            <p className="text-[#39FF14] font-black text-sm sm:text-base uppercase leading-relaxed">
+              Info akun dan password sudah dihilangkan demi keamanan karena tautan ini sudah direfresh atau pernah dibuka.
+            </p>
+          </div>
         </div>
       )}
     </motion.div>
@@ -105,14 +141,16 @@ const PrizeCard = ({ prize, isWinner, layoutClass = "", onImageClick = () => {},
 const GachaPlay = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const [step, setStep] = useState('loading'); // loading, ready, revealing, done
+  const [step, setStep] = useState('loading'); 
   const [prize, setPrize] = useState(null);
   const [dummies, setDummies] = useState([]);
-  const [selectedBox, setSelectedBox] = useState(null);
   const [error, setError] = useState('');
   const [givenAccountId, setGivenAccountId] = useState(null);
   const [isProcessingAction, setIsProcessingAction] = useState(false);
   const [packageAmount, setPackageAmount] = useState(50000);
+  
+  // State untuk melacak apakah Gacha sudah pernah dibuka (untuk hide password)
+  const [isAlreadyClaimed, setIsAlreadyClaimed] = useState(false);
 
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [infoModalContent, setInfoModalContent] = useState({ title: '', message: '', type: 'info' });
@@ -140,17 +178,19 @@ const GachaPlay = () => {
 
         if (gachaRes.data.status === 'not_used') {
           setPackageAmount(gachaRes.data.packageAmount || 50000);
+          setIsAlreadyClaimed(false);
           setStep('ready');
         } else {
           setPackageAmount(gachaRes.data.packageAmount || 50000);
-          setError("Tautan gacha ini telah digunakan sebelumnya.");
+          setError("TAUTAN GACHA INI SUDAH PERNAH DIMAINKAN!");
           setPrize(gachaRes.data.account);
           setGivenAccountId(gachaRes.data.accountId);
           setDummies(gachaRes.data.dummyPrizes || []);
+          setIsAlreadyClaimed(true); // Flag agar kredensial di hide
           setStep('done');
         }
       } catch (err) {
-        setError("Sistem gagal memuat data gacha. Tautan mungkin tidak valid.");
+        setError("GAGAL MEMUAT DATA. TAUTAN TIDAK VALID.");
         setStep('error');
         if (err.response?.status === 404 || err.response?.status === 400) {
           setTimeout(() => navigate('/auth'), 2000);
@@ -162,10 +202,7 @@ const GachaPlay = () => {
 
   const handleClaimGacha = async (boxIndex) => {
     if (step !== 'ready') return;
-    setSelectedBox(boxIndex);
     setError('');
-    
-    // Mulai fase animasi suspense membuka kapsul
     setStep('revealing');
 
     try {
@@ -174,18 +211,17 @@ const GachaPlay = () => {
       setPrize(res.data.account);
       setDummies(res.data.dummyPrizes);
       setGivenAccountId(res.data.accountId);
+      setIsAlreadyClaimed(false); // Baru klaim, munculkan password
       
-      // Tahan animasi suspense selama 2.5 detik untuk efek eksklusif
       setTimeout(() => {
-        confetti({ particleCount: 200, spread: 100, origin: { y: 0.4 }, colors: ['#f1c40f', '#e74c3c', '#ffffff', '#3498db'] });
+        confetti({ particleCount: 400, spread: 200, origin: { y: 0.3 }, colors: ['#FF3366', '#00E5FF', '#FFDE00', '#39FF14', '#FF90E8', '#000000'] });
         setStep('done');
-        showInfoModal('Klaim Berhasil', `Selamat, Anda mendapatkan Akun ${res.data.account.tier}.`, 'success');
       }, 2500);
 
     } catch (err) {
-      const msg = err.response?.data?.msg || 'Terjadi kesalahan saat memproses klaim.';
+      const msg = err.response?.data?.msg || 'TERJADI KESALAHAN SAAT KLAIM.';
       setError(msg);
-      showInfoModal('Gagal Memproses', msg, 'error');
+      showInfoModal('ERROR', msg, 'error');
       setStep('error');
     }
   };
@@ -193,7 +229,6 @@ const GachaPlay = () => {
   const handleRequestVerification = async () => {
     if (!prize) return;
     setIsProcessingAction(true);
-    // Wording diperjelas dengan spasi dan format yang rapi
     const msg = `Halo Admin, saya telah menerima akun gacha dan membutuhkan verifikasi login:\n\nEmail: ${prize.email}\nPassword: ${prize.password}\n\nMohon bantuannya untuk verifikasi. Terima kasih.`;
     window.open(`https://wa.me/${adminWaNumber}?text=${encodeURIComponent(msg)}`, '_blank');
     try { await API.post('/user/request-verification', { accountId: givenAccountId }); } catch (e) {}
@@ -205,7 +240,6 @@ const GachaPlay = () => {
     setIsProcessingAction(true);
     let text = '';
     
-    // Wording diperjelas dengan spasi dan format yang rapi
     if (action === 'ambil') {
       text = `Halo Admin, saya ingin KONFIRMASI PENGAMBILAN AKUN GACHA:\n\nTier: ${prize.tier}\nEmail: ${prize.email}\nPassword: ${prize.password}\n\nSaya akan mengambil akun ini. Terima kasih.`;
     } else {
@@ -216,30 +250,31 @@ const GachaPlay = () => {
     setTimeout(() => setIsProcessingAction(false), 1000);
   };
 
-  const renderPackageHeaderBadge = (amount) => {
-    return (
-      <div className="flex justify-center mb-6">
-        <div className="px-5 py-2 rounded border border-gray-600 bg-gray-800/50 text-gray-300 text-xs sm:text-sm font-semibold tracking-widest uppercase shadow-sm">
-          Nominal Paket: Rp {Number(amount).toLocaleString('id-ID')}
-        </div>
+  const renderContent = () => {
+    if (step === 'loading') return (
+      <div className="flex flex-col justify-center items-center min-h-[16rem] gap-4 w-full">
+        <div className="w-20 h-20 bg-[#00E5FF] brutal-border animate-spin"></div>
+        <p className="font-black text-3xl tracking-widest text-black mt-4">LOADING...</p>
       </div>
     );
-  };
-
-  const renderContent = () => {
-    if (step === 'loading') return <div className="loading-container"><LoadingSpinner size="h-10 w-10"/></div>;
-    if (step === 'error') return <motion.p className="error-text">{error}</motion.p>;
+    if (step === 'error') return (
+      <motion.div initial={{ x: -20 }} animate={{ x: 0 }} className="w-full bg-[#FF3366] brutal-border brutal-shadow p-8 text-center mx-4">
+        <p className="text-white font-black text-xl sm:text-3xl uppercase">{error}</p>
+      </motion.div>
+    );
     
     if (step === 'ready') {
+      const boxColors = ['#FF90E8', '#00E5FF', '#39FF14', '#FFDE00'];
       return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full space-y-8 py-4">
-          <div className="text-center space-y-2">
-            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-wide">Pilih Kotak Keberuntungan Anda</h3>
-            <p className="text-sm text-gray-400">Pilih satu kapsul untuk mengungkap hadiah utama Anda.</p>
+        <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="w-full space-y-12 py-6">
+          <div className="text-center space-y-4 px-4 w-full">
+            <h3 className="text-4xl sm:text-6xl font-black text-black uppercase drop-shadow-[5px_5px_0_#FFF]">PILIH KOTAKMU!</h3>
+            <p className="text-base sm:text-xl font-black text-white bg-black inline-block px-6 py-2 brutal-border transform -rotate-1 shadow-[4px_4px_0_#39FF14]">Satu kotak untuk mengubah nasibmu</p>
           </div>
-          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center items-center max-w-xl mx-auto sm:max-w-none">
+          {/* Kontainer box dibuat lebih besar */}
+          <div className="flex flex-col sm:flex-row flex-wrap gap-6 sm:gap-8 justify-center items-center w-full px-4">
             {[0, 1, 2, 3].map(index => (
-              <MysteryBox key={index} onClick={() => handleClaimGacha(index)} />
+              <MysteryBox key={index} colorHex={boxColors[index]} onClick={() => handleClaimGacha(index)} />
             ))}
           </div>
         </motion.div>
@@ -248,15 +283,29 @@ const GachaPlay = () => {
 
     if (step === 'revealing') {
       return (
-        <motion.div className="flex flex-col items-center justify-center py-16 space-y-8" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }}>
-          <div className="relative w-28 h-28 flex items-center justify-center">
-            <div className="absolute inset-0 border-4 border-t-yellow-500 border-r-transparent border-b-gray-600 border-l-transparent rounded-full animate-spin"></div>
-            <div className="absolute inset-2 border-4 border-t-transparent border-r-blue-500 border-b-transparent border-l-red-500 rounded-full animate-[spin_1.5s_linear_reverse_infinite]"></div>
-            <div className="w-10 h-10 bg-white rounded-full animate-pulse shadow-[0_0_20px_rgba(255,255,255,0.8)]"></div>
+        <motion.div className="flex flex-col items-center justify-center py-24 space-y-16 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <div className="relative w-40 h-40 sm:w-56 sm:h-56 flex items-center justify-center">
+            <motion.div 
+              className="absolute inset-0 bg-[#FFDE00] brutal-border shadow-[8px_8px_0_#000]"
+              animate={{ rotate: [0, 90, 180, 270, 360], scale: [1, 1.2, 1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div 
+              className="absolute inset-6 bg-[#FF3366] brutal-border"
+              animate={{ rotate: [360, 270, 180, 90, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <div className="z-10 bg-white brutal-border p-3">
+               <IconQuestionMark />
+            </div>
           </div>
-          <h3 className="text-lg sm:text-xl font-bold text-gray-300 tracking-[0.2em] uppercase animate-pulse">
-            Membuka Kapsul...
-          </h3>
+          <motion.h3 
+            className="text-3xl sm:text-5xl font-black text-black tracking-[0.3em] bg-[#39FF14] px-6 py-3 brutal-border shadow-[6px_6px_0_#000]"
+            animate={{ skewX: [0, -10, 10, 0] }}
+            transition={{ duration: 0.5, repeat: Infinity }}
+          >
+            MEMBUKA...
+          </motion.h3>
         </motion.div>
       );
     }
@@ -267,33 +316,35 @@ const GachaPlay = () => {
       const dummyCards = validDummies.map(d => ({ ...d, isWinner: false }));
       
       return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 sm:space-y-12 w-full py-4">
-          <div className="text-center">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-wider mb-2">Hadiah Utama Anda</h3>
-            <p className="text-sm text-gray-400">Selamat! Berikut adalah detail hadiah yang Anda dapatkan.</p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-20 w-full py-6 px-2 sm:px-4">
+          <div className="text-center relative w-full flex justify-center">
+            <div className="absolute inset-y-0 w-full max-w-4xl bg-[#FF90E8] transform -skew-y-2 -z-10 brutal-border mx-auto"></div>
+            <h3 className="text-4xl sm:text-7xl font-black text-black py-6 uppercase drop-shadow-[4px_4px_0_#FFF]">HADIAH UTAMA</h3>
           </div>
           
           <AnimatePresence>
             {winnerCard && (
-              <div className="flex justify-center px-2">
-                <PrizeCard prize={winnerCard} isWinner={true} layoutClass="w-full max-w-sm sm:w-[45%] lg:w-[35%] sm:max-w-md" delayIndex={0} />
+              <div className="flex justify-center w-full px-2">
+                {/* Melewatkan flag isHidden agar sistem keamanan berfungsi */}
+                <PrizeCard prize={winnerCard} isWinner={true} isHidden={isAlreadyClaimed} layoutClass="w-full max-w-lg sm:max-w-2xl" delayIndex={0} />
               </div>
             )}
           </AnimatePresence>
           
           {dummyCards.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }} className="mt-12 pt-10 border-t border-gray-800 text-center">
-              <h4 className="text-lg sm:text-xl font-bold text-gray-300 tracking-wide mb-4">Hadiah Alternatif Lainnya</h4>
-              <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-4 max-w-2xl mx-auto mb-8 text-left sm:text-center">
-                <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-                  <span className="text-yellow-500 font-bold uppercase tracking-wider block mb-1">Pemberitahuan Penting:</span> 
-                  Gambar pemain pada kartu di bawah ini adalah representasi dari kotak lain yang <span className="text-red-400 font-semibold">TIDAK</span> Anda dapatkan. Anda hanya berhak atas hadiah utama di atas.
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }} className="mt-24 pt-12 text-center w-full border-t-8 border-black border-dashed">
+              
+              <div className="bg-black text-white p-6 mb-12 brutal-shadow transform rotate-1 border-4 border-[#00E5FF] mx-auto w-full max-w-4xl">
+                <h4 className="text-2xl sm:text-4xl font-black uppercase tracking-widest text-[#00E5FF]">KOTAK YANG TERLEWAT</h4>
+                <p className="text-sm sm:text-base font-bold mt-3 text-[#F4F4F0]">
+                  INFO: Kartu di bawah adalah isi dari kotak yang <span className="text-[#FF3366] bg-white px-2 py-0.5 text-black brutal-border">TIDAK</span> kamu pilih.
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+              {/* Grid untuk kotak yang terlewat */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center w-full max-w-7xl mx-auto">
                 {dummyCards.map((p, index) => (
-                  <PrizeCard key={`dummy-${index}`} prize={p} isWinner={false} layoutClass="w-full max-w-xs" onImageClick={setFullScreenImage} delayIndex={index + 1} />
+                  <PrizeCard key={`dummy-${index}`} prize={p} isWinner={false} isHidden={false} layoutClass="w-full max-w-xs sm:max-w-sm" onImageClick={setFullScreenImage} delayIndex={index + 1} />
                 ))}
               </div>
             </motion.div>
@@ -305,35 +356,56 @@ const GachaPlay = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="main-container">
-      <div className="py-6 border-b border-gray-800 mb-6">
-        <h2 className="header-text uppercase tracking-widest text-white">Status Klaim Gacha</h2>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full pb-12">
+      
+      {/* Animasi Marquee Brutalism Full Width */}
+      <div className="w-full bg-[#39FF14] brutal-border border-b-8 mb-10 overflow-hidden py-4 brutal-shadow whitespace-nowrap flex">
+        <motion.div 
+          className="font-black text-2xl sm:text-3xl uppercase tracking-widest text-black shrink-0 flex gap-12"
+          animate={{ x: [0, -1000] }}
+          transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+        >
+          <span>⚡ MONDZGAME GACHA SYSTEM ⚡ KLAIM HADIAHMU SEKARANG ⚡ MONDZGAME GACHA SYSTEM ⚡ KLAIM HADIAHMU SEKARANG ⚡ MONDZGAME GACHA SYSTEM ⚡ KLAIM HADIAHMU SEKARANG ⚡</span>
+        </motion.div>
+      </div>
+
+      {/* Header Info */}
+      <div className="flex flex-col items-center justify-center mb-12 w-full px-4">
+        <div className="bg-white brutal-border brutal-shadow p-3 mb-6 transform -rotate-2">
+          <img src="/my-company-logo.png" alt="MondzGame Logo" className="h-16 sm:h-24 w-auto" />
+        </div>
+        
+        {/* Nominal Badge */}
+        <div className="bg-black text-white brutal-border px-8 py-4 transform rotate-1 shadow-[8px_8px_0_#FF3366]">
+          <span className="font-black text-lg sm:text-2xl tracking-widest">NOMINAL PAKET: <span className="text-[#FFDE00]">Rp {Number(packageAmount).toLocaleString('id-ID')}</span></span>
+        </div>
       </div>
       
-      {renderPackageHeaderBadge(packageAmount)}
+      {/* KONTEN UTAMA - Lebar Penuh */}
+      <div className="w-full bg-white brutal-border brutal-shadow-lg p-6 sm:p-12 md:p-16 mb-12 pattern-grid">
+        {renderContent()}
+      </div>
 
-      {error && step !== 'done' && <motion.p className="error-text mb-4 bg-red-900/20 py-3 rounded border border-red-800/50">{error}</motion.p>}
-      
-      <div className="content-container">{renderContent()}</div>
-
+      {/* ACTIONS BAWAH */}
       {step === 'done' && prize && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }} className="actions-container mt-10 pt-8 border-t border-gray-800">
-          <div className="mb-8 p-5 bg-gray-800/50 border border-gray-700 rounded-xl text-left sm:text-center shadow-inner">
-            <h4 className="text-yellow-500 font-bold text-sm sm:text-base uppercase tracking-wider mb-2">Tindakan Diperlukan</h4>
-            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
-              Pastikan Anda menyimpan detail akses di atas. Informasi tersebut tidak akan ditampilkan kembali setelah halaman ini ditutup. Pilih tindakan konfirmasi Anda di bawah ini.
+        <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2 }} className="w-full bg-[#00E5FF] brutal-border brutal-shadow-lg p-6 sm:p-12 mx-auto">
+          
+          <div className="bg-white brutal-border p-6 mb-10 transform -rotate-1 shadow-[10px_10px_0_#000] w-full max-w-5xl mx-auto">
+            <h4 className="text-black font-black text-2xl sm:text-3xl uppercase tracking-wider mb-3">! TINDAKAN DIPERLUKAN !</h4>
+            <p className="text-black font-bold text-base sm:text-lg uppercase">
+              {isAlreadyClaimed ? 'TAUTAN INI SUDAH DIBUKA. ANDA BISA MEMINTA BANTUAN ADMIN JIKA LUPA PASSWORD.' : 'SIMPAN DETAIL AKUN SEKARANG! Info tidak akan muncul lagi setelah ditutup. Wajib pilih konfirmasi WA di bawah!'}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <button onClick={() => handleWAConfirmation('ambil')} className="button-action bg-white text-black hover:bg-gray-200">
-              Konfirmasi Pengambilan (WA)
+          <div className="flex flex-col md:flex-row gap-6 justify-center items-center w-full max-w-6xl mx-auto">
+            <button onClick={() => handleWAConfirmation('ambil')} className="w-full md:flex-1 button-brutal bg-[#39FF14] text-black text-lg sm:text-xl">
+              ✅ KONFIRMASI AMBIL
             </button>
-            <button onClick={handleRequestVerification} className="button-action bg-gray-700 text-white hover:bg-gray-600 border border-gray-600">
-              Minta Bantuan Verifikasi (WA)
+            <button onClick={handleRequestVerification} className="w-full md:flex-1 button-brutal bg-[#FFDE00] text-black text-lg sm:text-xl">
+              🆘 BANTUAN ADMIN
             </button>
-            <button onClick={() => handleWAConfirmation('tidak_ambil')} className="button-action bg-transparent text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500">
-              Batalkan Pengambilan (WA)
+            <button onClick={() => handleWAConfirmation('tidak_ambil')} className="w-full md:flex-1 button-brutal bg-[#FF3366] text-white text-lg sm:text-xl">
+              ❌ BATALKAN
             </button>
           </div>
         </motion.div>
@@ -348,65 +420,71 @@ const GachaPlay = () => {
   );
 };
 
-// Styling CSS Premium
+// =====================================================================
+// CSS INJECTION (NEO-BRUTALISM RULES FULL WIDTH)
+// =====================================================================
 const styles = `
-  body { background-color: #0b0f19; }
-  .main-container { background-color: #111827; padding: 0 1.5rem 2.5rem; border-radius: 1.25rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 95%; sm:max-width: 65rem; margin: 2rem auto; border: 1px solid #1e293b; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; position: relative;}
-  
-  .header-text { font-size: 1.25rem; font-weight: 700; text-align: center; }
-  .error-text { color: #f87171; text-align: center; font-size: 0.9rem; font-weight: 500; }
-  .loading-container { display: flex; justify-content: center; align-items: center; min-height: 16rem; }
-  .content-container { min-height: 20rem; display: flex; align-items: center; justify-content: center; width: 100%; }
-  
-  .button-action { font-weight: 600; padding: 0.85rem 1.5rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.025em;}
-  .button-action:hover { transform: translateY(-2px); }
-  
-  .mystery-box { width: calc(50% - 0.5rem); sm:width: calc(25% - 0.75rem); height: 11rem; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0.75rem; }
-  .mystery-box-inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-  
-  .prize-card { border-radius: 1rem; overflow: hidden; display: flex; flex-direction: column; background-color: #0f172a; border: 1px solid #334155; position: relative;}
-  .prize-card-winner { box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.05); border: 1px solid #475569; z-index: 10; }
-  .prize-card-dummy { opacity: 0.9; transform: scale(0.95); }
-  
-  .prize-card-top { text-align: center; flex-grow: 1; background: linear-gradient(180deg, rgba(30,41,59,0.5) 0%, rgba(15,23,42,1) 100%); }
-  .prize-card-label { font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem; letter-spacing: 0.1em; }
-  .prize-card-tier { margin-bottom: 1.25rem; text-shadow: 0 2px 15px rgba(0,0,0,0.5); }
-  .prize-card-player-label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;}
-  
-  .player-image-wrapper { border-radius: 0.5rem; background-color: #020617; padding: 5px; display: flex; align-items: center; justify-content: center; width: 5.5rem; height: 5.5rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
-  .player-image { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 0.25rem; }
-  
-  /* SHINE EFFECT UNTUK KARTU PEMENANG */
-  .shine-effect {
-      position: absolute;
-      top: 0; left: -150%; width: 50%; height: 100%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-      transform: skewX(-25deg);
-      animation: shine 4s infinite;
-      pointer-events: none;
-      z-index: 20;
+  body { 
+    background-color: #B8C0FF;
+    background-image: radial-gradient(#000 1px, transparent 1px);
+    background-size: 20px 20px;
+    font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif; 
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
-  @keyframes shine {
-      0% { left: -150%; }
-      20% { left: 200%; }
-      100% { left: 200%; }
+  
+  /* Utilities Brutalism */
+  .brutal-border { border: 4px solid #000; }
+  .brutal-border-bottom { border-bottom: 6px solid #000; }
+  
+  .brutal-shadow { 
+    box-shadow: 8px 8px 0px 0px #000; 
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  }
+  .brutal-shadow-lg { box-shadow: 16px 16px 0px 0px #000; }
+  
+  .hover-brutal:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0px 0px #000;
+  }
+  .hover-brutal:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px #000;
   }
 
-  /* WARNA TIER YANG LEBIH ELEGAN (DEEP GRADIENTS) */
-  .tier-radiant { border-top-color: #ef4444; }
-  .tier-radiant .prize-card-top { background: linear-gradient(180deg, rgba(127,29,29,0.3) 0%, rgba(15,23,42,1) 100%); }
-  
-  .tier-flux { border-top-color: #eab308; }
-  .tier-flux .prize-card-top { background: linear-gradient(180deg, rgba(133,77,14,0.3) 0%, rgba(15,23,42,1) 100%); }
-  
-  .tier-pulse { border-top-color: #22c55e; }
-  .tier-pulse .prize-card-top { background: linear-gradient(180deg, rgba(20,83,45,0.3) 0%, rgba(15,23,42,1) 100%); }
-  
-  .tier-nova { border-top-color: #3b82f6; }
-  .tier-nova .prize-card-top { background: linear-gradient(180deg, rgba(30,58,138,0.3) 0%, rgba(15,23,42,1) 100%); }
+  /* Patterns */
+  .pattern-grid {
+    background-size: 50px 50px;
+    background-image: linear-gradient(to right, rgba(0,0,0,0.08) 2px, transparent 2px), linear-gradient(to bottom, rgba(0,0,0,0.08) 2px, transparent 2px);
+  }
+  .pattern-dots {
+    background-image: radial-gradient(#000 3px, transparent 3px);
+    background-size: 20px 20px;
+  }
+
+  /* Buttons */
+  .button-brutal { 
+    font-weight: 900; 
+    padding: 1.5rem 1rem; 
+    border: 4px solid #000;
+    box-shadow: 8px 8px 0px 0px #000;
+    cursor: pointer; 
+    transition: all 0.15s ease; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .button-brutal:hover { 
+    transform: translate(-6px, -6px); 
+    box-shadow: 14px 14px 0px 0px #000;
+  }
+  .button-brutal:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px 0px #000;
+  }
 `;
 
-const styleId = 'gachaplay-styles-dynamic';
+const styleId = 'gachaplay-brutalism-styles';
 if (!document.getElementById(styleId)) {
     const styleElement = document.createElement("style");
     styleElement.id = styleId;
