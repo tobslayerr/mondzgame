@@ -1,11 +1,10 @@
 // src/pages/GachaPage.jsx
 import React from 'react';
 import GachaPlay from '../components/GachaPlay';
-import { motion } from 'framer-motion';
 
 const GachaPage = () => {
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-white font-sans flex items-center justify-center py-6 sm:py-12 px-2 sm:px-4">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white font-['Plus_Jakarta_Sans',sans-serif]">
       <GachaPlay />
     </div>
   );
