@@ -27,11 +27,6 @@ const UserDashboardPage = () => {
         <h1 className="text-3xl sm:text-4xl font-bold text-center text-gacha-red mb-4">
           Lakukan Pembayaran Gacha
         </h1>
-        <p className="text-center text-text-muted mb-8 max-w-2xl mx-auto">
-          Pembayaran gacha sebesar **Rp 50.000,-**.
-          Silakan isi email, pilih metode, lalu lakukan transfer.
-          Klik konfirmasi untuk validasi via WhatsApp.
-        </p>
         
         {/* Render komponen InvoiceForm yang sudah dirombak */}
         <InvoiceForm />

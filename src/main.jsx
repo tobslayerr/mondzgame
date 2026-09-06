@@ -16,7 +16,10 @@ import ListAccountPage from './pages/admin/ListAccountPage.jsx';
 import InvoicePage from './pages/admin/InvoicePage.jsx';
 import AdminPaymentSettings from './pages/admin/AdminPaymentSettings.jsx';
 import AdminPlayerConfigs from './pages/admin/AdminPlayerConfigs.jsx';
-import AdminPackageConfigs from './pages/admin/AdminPackageConfigs.jsx'; // <-- 1. Import halaman pengaturan probabilitas paket
+import AdminPackageConfigs from './pages/admin/AdminPackageConfigs.jsx';
+
+// Import Superadmin Guard untuk keamanan lapis kedua
+import SuperadminGuard from './components/SuperadminGuard.jsx';
 
 // Component for private routes
 const PrivateRoute = ({ children }) => {
@@ -55,9 +58,21 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="accounts/add" element={<AddAccountPage />} />
           <Route path="accounts/list" element={<ListAccountPage />} />
           <Route path="invoices" element={<InvoicePage />} />
-          <Route path="payment-settings" element={<AdminPaymentSettings />} />
+          
+          {/* Rute tanpa pelindung Superadmin */}
           <Route path="player-configs" element={<AdminPlayerConfigs />} />
-          <Route path="package-configs" element={<AdminPackageConfigs />} /> {/* <-- 2. Daftarkan rute ke sini */}
+          <Route path="package-configs" element={<AdminPackageConfigs />} />
+          
+          {/* --- RUTE DENGAN PERLINDUNGAN SUPERADMIN --- */}
+          <Route 
+            path="payment-settings" 
+            element={
+              <SuperadminGuard>
+                <AdminPaymentSettings />
+              </SuperadminGuard>
+            } 
+          />
+          {/* --- END RUTE PERLINDUNGAN SUPERADMIN --- */}
           
           {/* Catch-all route untuk 404 dalam dashboard */}
           <Route path="*" element={<Navigate to="accounts/list" replace />} />

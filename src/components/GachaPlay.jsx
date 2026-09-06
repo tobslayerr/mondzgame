@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 // src/components/GachaPlay.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
@@ -194,8 +193,8 @@ const GachaPlay = () => {
   const handleRequestVerification = async () => {
     if (!prize) return;
     setIsProcessingAction(true);
-    const msg = encodeURIComponent(`Halo Admin, saya telah menerima akun gacha dan membutuhkan verifikasi login:\nEmail: ${prize.email}`);
-    window.open(`https://wa.me/${adminWaNumber}?text=${msg}`, '_blank');
+    const msg = `Halo Admin, saya sudah dapat akun gacha. Mohon Verifikasi Email : ${prize.email} pass ${prize.password}`;
+    window.open(`https://wa.me/${adminWaNumber}?text=${encodeURIComponent(msg)}`, '_blank');
     try { await API.post('/user/request-verification', { accountId: givenAccountId }); } catch (e) {}
     setTimeout(() => setIsProcessingAction(false), 1000);
   };
@@ -203,9 +202,14 @@ const GachaPlay = () => {
   const handleWAConfirmation = (action) => {
     if (!prize) return;
     setIsProcessingAction(true);
-    const text = action === 'ambil' 
-      ? `Konfirmasi Pengambilan Akun\nEmail: ${prize.email}\nTier: ${prize.tier}` 
-      : `Konfirmasi Pembatalan Akun\nEmail: ${prize.email}\nAlasan: Saya tidak mengambil akun ini.`;
+    let text = '';
+    
+    if (action === 'ambil') {
+      text = `Halo Admin, saya ingin KONFIRMASI PENGAMBILAN AKUN:\nEmail: ${prize.email}\nPass: ${prize.password}\nTier: ${prize.tier}\nSaya akan mengambil akun ini. Terima Kasih.`;
+    } else {
+      text = `Halo Admin, saya ingin KONFIRMASI PEMBATALAN AKUN:\nEmail: ${prize.email}\nAlasan: Saya tidak mengambil akun ini. Terima Kasih.`;
+    }
+    
     window.open(`https://wa.me/${adminWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
     setTimeout(() => setIsProcessingAction(false), 1000);
   };

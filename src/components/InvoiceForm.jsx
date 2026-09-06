@@ -198,6 +198,14 @@ const InvoiceForm = () => {
   return (
     <div className="bg-secondary-dark p-6 sm:p-8 rounded-xl shadow-2xl border border-gray-700">
       
+      {/* --- Instruksi Pembayaran Dinamis --- */}
+      <div className="mb-8 p-4 bg-gray-800/60 border border-gray-700 rounded-lg text-center shadow-inner">
+        <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+          Pembayaran gacha sebesar <strong className="text-yellow-400 font-bold text-lg">Rp {selectedAmount.toLocaleString('id-ID')}</strong>. 
+          Silakan isi email, pilih metode, lalu lakukan transfer. Klik konfirmasi untuk validasi via WhatsApp.
+        </p>
+      </div>
+
       {/* 1. Input Email */}
       <div className="mb-6">
           <label className="input-label" htmlFor="email">

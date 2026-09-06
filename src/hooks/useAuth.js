@@ -1,3 +1,4 @@
+// src/hooks/useAuth.js
 import { useState, useEffect, useCallback } from 'react';
 import API from '../services/api';
 
@@ -28,7 +29,12 @@ const useAuth = () => {
     }, []);
 
     const logout = useCallback(() => {
+        // 1. Hapus token admin utama
         localStorage.removeItem('token');
+        
+        // 2. Hapus token superadmin (keamanan lapis kedua)
+        sessionStorage.removeItem('superadminToken');
+        
         setToken(null);
         setIsAuthenticated(false);
     }, []);
