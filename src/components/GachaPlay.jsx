@@ -193,7 +193,8 @@ const GachaPlay = () => {
   const handleRequestVerification = async () => {
     if (!prize) return;
     setIsProcessingAction(true);
-    const msg = `Halo Admin, saya sudah dapat akun gacha. Mohon Verifikasi Email : ${prize.email} pass ${prize.password}`;
+    // Wording diperjelas dengan spasi dan format yang rapi
+    const msg = `Halo Admin, saya telah menerima akun gacha dan membutuhkan verifikasi login:\n\nEmail: ${prize.email}\nPassword: ${prize.password}\n\nMohon bantuannya untuk verifikasi. Terima kasih.`;
     window.open(`https://wa.me/${adminWaNumber}?text=${encodeURIComponent(msg)}`, '_blank');
     try { await API.post('/user/request-verification', { accountId: givenAccountId }); } catch (e) {}
     setTimeout(() => setIsProcessingAction(false), 1000);
@@ -204,10 +205,11 @@ const GachaPlay = () => {
     setIsProcessingAction(true);
     let text = '';
     
+    // Wording diperjelas dengan spasi dan format yang rapi
     if (action === 'ambil') {
-      text = `Halo Admin, saya ingin KONFIRMASI PENGAMBILAN AKUN:\nEmail: ${prize.email}\nPass: ${prize.password}\nTier: ${prize.tier}\nSaya akan mengambil akun ini. Terima Kasih.`;
+      text = `Halo Admin, saya ingin KONFIRMASI PENGAMBILAN AKUN GACHA:\n\nTier: ${prize.tier}\nEmail: ${prize.email}\nPassword: ${prize.password}\n\nSaya akan mengambil akun ini. Terima kasih.`;
     } else {
-      text = `Halo Admin, saya ingin KONFIRMASI PEMBATALAN AKUN:\nEmail: ${prize.email}\nAlasan: Saya tidak mengambil akun ini. Terima Kasih.`;
+      text = `Halo Admin, saya ingin KONFIRMASI PEMBATALAN AKUN GACHA:\n\nTier: ${prize.tier}\nEmail: ${prize.email}\n\nAlasan: Saya memutuskan untuk tidak mengambil akun ini. Terima kasih.`;
     }
     
     window.open(`https://wa.me/${adminWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
